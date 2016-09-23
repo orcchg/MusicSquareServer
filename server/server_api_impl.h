@@ -29,6 +29,7 @@
 #ifndef MSQ_SERVER_API_IMPL__H__
 #define MSQ_SERVER_API_IMPL__H__
 
+#include <string>
 #include <vector>
 #include <cstdint>
 #include "database/models_db.h"
@@ -40,9 +41,11 @@ public:
   ~ServerApiImpl();
   std::vector<SmallModel> getModels() override;
   Model getModel(int64_t id) override;
+  std::vector<std::string> getTitles() override;
 
 private:
   db::ModelsDatabase m_db;
+  std::vector<std::string> m_titles;
 };
 
 #endif  // MSQ_SERVER_API_IMPL__H__

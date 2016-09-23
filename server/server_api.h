@@ -29,6 +29,7 @@
 #ifndef MSQ_SERVER_API__H__
 #define MSQ_SERVER_API__H__
 
+#include <string>
 #include <vector>
 #include <cstdint>
 #include "model.h"
@@ -38,6 +39,7 @@ public:
   virtual ~IServerApi() {}
   virtual std::vector<SmallModel> getModels() = 0;
   virtual Model getModel(int64_t id) = 0;
+  virtual std::vector<std::string>& getTitles() = 0;
 };
 
 #endif  // MSQ_SERVER_API__H__

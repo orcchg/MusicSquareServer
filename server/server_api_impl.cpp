@@ -29,6 +29,12 @@
 #include "server_api_impl.h"
 
 ServerApiImpl::ServerApiImpl() {
+  m_titles = {"alternative", "african", "bard", "blues", "classical", "conjazz", "country",
+              "dance", "disco", "dnb", "dubstep", "dub", "electronics", "estrada", "folk",
+              "house", "indie", "industrial", "jazz", "latinfolk", "local-indie", "lounge",
+              "metal", "newwave", "pop", "prog", "punk", "rap", "reggae", "relax", "rnb",
+              "rock","rosrap", "rusfolk", "rusrock", "soul", "soundtrack", "trance", "ukrrock",
+              "urban", "videogame"};
 }
 
 ServerApiImpl::~ServerApiImpl() {
@@ -40,5 +46,9 @@ std::vector<SmallModel> ServerApiImpl::getModels() {
 
 Model ServerApiImpl::getModel(int64_t id) {
   return m_db.getModel(id);
+}
+
+std::vector<std::string>& ServerApiImpl::getTitles() {
+  return m_titles;
 }
 

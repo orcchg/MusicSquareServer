@@ -69,6 +69,7 @@ private:
   void sendError(int socket, int error_code, const std::string& message) const;
   void sendModels(int socket, const std::vector<SmallModel>& models) const;
   void sendModel(int socket, const Model& model) const;
+  void sendTitles(int socket, const std::vector<std::string>& titles) const;
 
   int64_t parseId(const std::string& path);
   void printClientInfo(sockaddr_in& peeraddr);

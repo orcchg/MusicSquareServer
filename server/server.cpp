@@ -71,6 +71,7 @@ Server::Server(int port)
   m_methods["DELETE"] = Method::DELETE;
 
   m_paths[PATH_ALL]    = Path::ALL;
+  m_paths[PATH_GENRES] = Path::GENRES;
   m_paths[PATH_SINGLE] = Path::SINGLE;
 
   m_api_impl = new ServerApiImpl();
@@ -199,8 +200,21 @@ void Server::handleRequest(int socket) {
           case Method::GET:
             {
               INF("Get all");
-              std::vector<SmallModel> models = m_api_impl->getModels();
+              std::vector<SmallModel> models;
+              m_api_impl->getModels(&models);
               sendModels(socket, models);
+            }
+            break;
+        }
+        break;
+      case Path::GENRES:
+        switch (method) {
+          case Method::GET:
+            {
+              INF("Get genres");
+              std::vector<std::string> genres;
+              m_api_impl->getTitles(&genres);
+              sendTitles(socket, genres);
             }
             break;
         }
@@ -261,6 +275,19 @@ void Server::sendModel(int socket, const Model& model) const {
   std::string json = model.toJson();
   VER("Send model: %s", model.toString().c_str());
   sendToSocket(socket, json);
+}
+
+void Server::sendTitles(int socket, const std::vector<std::string>& titles) const {
+  const char* delim = "";
+  std::ostringstream json;
+  json << "[";
+  for (auto& item : titles) {
+    json << delim << item;
+    delim = ",";
+  }
+  json << "]";
+  VER("Send titles: %s", json.str().c_str());
+  sendToSocket(socket, json.str());
 }
 
 /* Utility */

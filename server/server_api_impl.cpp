@@ -26,6 +26,7 @@
  *   Only the original author - Maxim Alov - has right to do any of the above actions.
  */
 
+#include <algorithm>
 #include "server_api_impl.h"
 
 ServerApiImpl::ServerApiImpl() {
@@ -40,15 +41,15 @@ ServerApiImpl::ServerApiImpl() {
 ServerApiImpl::~ServerApiImpl() {
 }
 
-std::vector<SmallModel> ServerApiImpl::getModels() {
-  return m_db.getSmallModels();
-}
-
 Model ServerApiImpl::getModel(int64_t id) {
   return m_db.getModel(id);
 }
 
-std::vector<std::string>& ServerApiImpl::getTitles() {
-  return m_titles;
+void ServerApiImpl::getModels(std::vector<SmallModel>* const output) {
+  m_db.getSmallModels(output);
+}
+
+void ServerApiImpl::getTitles(std::vector<std::string>* const output) {
+  std::copy(m_titles.begin(), m_titles.end(), std::back_inserter(*output));
 }
 

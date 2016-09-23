@@ -34,9 +34,11 @@
 #include <vector>
 
 #define D_PATH_ALL    "/all"
+#define D_PATH_GENRES "/genres"
 #define D_PATH_SINGLE "/single"
 
 extern const char* PATH_ALL;
+extern const char* PATH_GENRES;
 extern const char* PATH_SINGLE;
 
 enum class Method : int {
@@ -44,7 +46,7 @@ enum class Method : int {
 };
 
 enum class Path : int {
-  UNKNOWN = -1, ALL = 0, SINGLE = 1
+  UNKNOWN = -1, ALL = 0, GENRES = 1, SINGLE = 2
 };
 
 namespace common {

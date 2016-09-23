@@ -29,13 +29,14 @@
 #include "common.h"
 
 const char* PATH_ALL    = D_PATH_ALL;
+const char* PATH_GENRES = D_PATH_GENRES;
 const char* PATH_SINGLE = D_PATH_SINGLE;
 
 namespace common {
 
 std::string arrayToJson(const std::vector<const Jsonable*>& array) {
   std::ostringstream oss;
-  char* delim = "";
+  const char* delim = "";
   oss << "[";
   for (auto& item : array) {
     oss << delim << item->toJson();

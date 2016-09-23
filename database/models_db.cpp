@@ -183,21 +183,19 @@ Model ModelsDatabase::getModel(int64_t i_model_id) {
   return (model);
 }
 
-std::vector<Model> ModelsDatabase::getModels() {
+void ModelsDatabase::getModels(std::vector<Model>* const output) {
   INF("enter ModelsDatabase::getModels().");
   std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
   select_statement += "';";
 
-  std::vector<Model> models;
   this->__prepare_statement__(select_statement);
   while (sqlite3_step(this->m_db_statement) != SQLITE_DONE) {
     Model model = getModelFromStatement();
-    models.push_back(model);
+    output->push_back(model);
   }
   this->__finalize__(select_statement.c_str());
   INF("exit ModelsDatabase::getModels().");
-  return (models);
 }
 
 // ----------------------------------------------
@@ -218,21 +216,19 @@ SmallModel ModelsDatabase::getSmallModel(int64_t i_model_id) {
   return (model);
 }
 
-std::vector<SmallModel> ModelsDatabase::getSmallModels() {
+void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output) {
   INF("enter ModelsDatabase::getSmallModels().");
   std::string select_statement = "SELECT " D_COLUMN_NAME_ROW_ID "," D_COLUMN_NAME_MODEL_ID "," D_COLUMN_NAME_MODEL_NAME "," D_COLUMN_NAME_MODEL_COVER_SMALL " FROM '";
   select_statement += this->m_table_name;
   select_statement += "';";
 
-  std::vector<SmallModel> models;
   this->__prepare_statement__(select_statement);
   while (sqlite3_step(this->m_db_statement) != SQLITE_DONE) {
     SmallModel model = getSmallModelFromStatement();
-    models.push_back(model);
+    output->push_back(model);
   }
   this->__finalize__(select_statement.c_str());
   INF("exit ModelsDatabase::getSmallModels().");
-  return (models);
 }
 
 /* Private members */

@@ -39,9 +39,9 @@ class ServerApiImpl : public IServerApi {
 public:
   ServerApiImpl();
   ~ServerApiImpl();
-  std::vector<SmallModel> getModels() override;
   Model getModel(int64_t id) override;
-  std::vector<std::string> getTitles() override;
+  void getModels(std::vector<SmallModel>* const output) override;
+  void getTitles(std::vector<std::string>* const output) override;
 
 private:
   db::ModelsDatabase m_db;

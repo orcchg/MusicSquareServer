@@ -67,9 +67,9 @@ public:
   int64_t addModel(const Model& model);
   void removeModel(int64_t id);
   Model getModel(int64_t id);
-  std::vector<Model> getModels();
+  void getModels(std::vector<Model>* const output);
   SmallModel getSmallModel(int64_t id);
-  std::vector<SmallModel> getSmallModels();
+  void getSmallModels(std::vector<SmallModel>* const output);
 
 private:
   void __init__() override final;

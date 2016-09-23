@@ -70,6 +70,8 @@ public:
   void getModels(std::vector<Model>* const output);
   SmallModel getSmallModel(int64_t id);
   void getSmallModels(std::vector<SmallModel>* const output);
+  void getSmallModels(std::vector<SmallModel>* const output, int limit, int offset);
+  void getSmallModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles);
 
 private:
   void __init__() override final;
@@ -77,6 +79,7 @@ private:
 
   Model getModelFromStatement();
   SmallModel getSmallModelFromStatement();
+  void getSmallModelsFromStatement(std::vector<SmallModel>* const output, const std::string& select_statement);
 
   ModelsDatabase(const ModelsDatabase& obj) = delete;
   ModelsDatabase& operator = (const ModelsDatabase& rhs) = delete;

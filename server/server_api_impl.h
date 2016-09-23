@@ -40,7 +40,8 @@ public:
   ServerApiImpl();
   ~ServerApiImpl();
   Model getModel(int64_t id) override;
-  void getModels(std::vector<SmallModel>* const output) override;
+  void getModels(std::vector<SmallModel>* const output, int limit, int offset) override;
+  void getModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) override;
   void getTitles(std::vector<std::string>* const output) override;
 
 private:

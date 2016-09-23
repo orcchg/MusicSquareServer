@@ -222,13 +222,45 @@ void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output) {
   select_statement += this->m_table_name;
   select_statement += "';";
 
-  this->__prepare_statement__(select_statement);
-  while (sqlite3_step(this->m_db_statement) != SQLITE_DONE) {
-    SmallModel model = getSmallModelFromStatement();
-    output->push_back(model);
-  }
-  this->__finalize__(select_statement.c_str());
+  getSmallModelsFromStatement(output, select_statement);
   INF("exit ModelsDatabase::getSmallModels().");
+}
+
+void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output, int limit, int offset) {
+  INF("enter ModelsDatabase::getSmallModels()");
+  std::string select_statement = "SELECT " D_COLUMN_NAME_ROW_ID "," D_COLUMN_NAME_MODEL_ID "," D_COLUMN_NAME_MODEL_NAME "," D_COLUMN_NAME_MODEL_COVER_SMALL " FROM '";
+  select_statement += this->m_table_name;
+  select_statement += "' LIMIT ";
+  select_statement += std::to_string(limit);
+  select_statement += " OFFSET ";
+  select_statement += std::to_string(offset);
+  select_statement += ";";
+
+  getSmallModelsFromStatement(output, select_statement);
+  INF("exit ModelsDatabase::getSmallModels()");
+}
+
+void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) {
+  INF("enter ModelsDatabase::getSmallModels()");
+  std::ostringstream oss;
+  const char* delim = "";
+  for (auto& item : titles) {
+    oss << delim << COLUMN_NAME_MODEL_GENRES << " LIKE '%" << item << "%'";
+    delim = " OR ";
+  }
+
+  std::string select_statement = "SELECT " D_COLUMN_NAME_ROW_ID "," D_COLUMN_NAME_MODEL_ID "," D_COLUMN_NAME_MODEL_NAME "," D_COLUMN_NAME_MODEL_COVER_SMALL " FROM '";
+  select_statement += this->m_table_name;
+  select_statement += "' WHERE ";
+  select_statement += oss.str();
+  select_statement += " LIMIT ";
+  select_statement += std::to_string(limit);
+  select_statement += " OFFSET ";
+  select_statement += std::to_string(offset);
+  select_statement += ";";
+
+  getSmallModelsFromStatement(output, select_statement);
+  INF("exit ModelsDatabase::getSmallModels()");
 }
 
 /* Private members */
@@ -331,6 +363,17 @@ SmallModel ModelsDatabase::getSmallModelFromStatement() {
 
   DBG("exit ModelsDatabase::getSmallModelFromStatement()");
   return (model);
+}
+
+void ModelsDatabase::getSmallModelsFromStatement(std::vector<SmallModel>* const output, const std::string& select_statement) {
+  DBG("enter ModelsDatabase::getSmallModelsFromStatement()");
+  this->__prepare_statement__(select_statement);
+  while (sqlite3_step(this->m_db_statement) != SQLITE_DONE) {
+    SmallModel model = getSmallModelFromStatement();
+    output->push_back(model);
+  }
+  this->__finalize__(select_statement.c_str());
+  DBG("exit ModelsDatabase::getSmallModelsFromStatement()");
 }
 
 }  // namespace db

@@ -33,6 +33,18 @@
 #include <sstream>
 #include <vector>
 
+/**
+ * GET /all?limit=20&offset=25&genres=rap,rnb,rock
+ */
+
+/**
+ * GET /genres
+ */
+
+/**
+ *  GET /single?id=100500
+ */
+
 #define D_PATH_ALL    "/all"
 #define D_PATH_GENRES "/genres"
 #define D_PATH_SINGLE "/single"

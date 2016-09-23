@@ -43,6 +43,9 @@
 #define D_ITEM_DESCRIPTION  "description"
 #define D_ITEM_COVER        "cover"
 
+#define D_ITEM_LIMIT        "limit"
+#define D_ITEM_OFFSET       "offset"
+
 #define D_COVER_BIG   "big"
 #define D_COVER_SMALL "small"
 
@@ -54,6 +57,9 @@ extern const char* ITEM_ALBUMS;
 extern const char* ITEM_LINK;
 extern const char* ITEM_DESCRIPTION;
 extern const char* ITEM_COVER;
+
+extern const char* ITEM_LIMIT;
+extern const char* ITEM_OFFSET;
 
 extern const char* COVER_BIG;
 extern const char* COVER_SMALL;

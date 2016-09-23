@@ -72,6 +72,7 @@ private:
   void sendTitles(int socket, const std::vector<std::string>& titles) const;
 
   int64_t parseId(const std::string& path);
+  void parseParamsForAll(const std::string& path, int* limit, int* offset, std::vector<std::string>* titles);
   void printClientInfo(sockaddr_in& peeraddr);
 };
 

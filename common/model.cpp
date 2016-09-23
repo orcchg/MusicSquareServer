@@ -38,6 +38,9 @@ const char* ITEM_LINK        = D_ITEM_LINK;
 const char* ITEM_DESCRIPTION = D_ITEM_DESCRIPTION;
 const char* ITEM_COVER       = D_ITEM_COVER;
 
+const char* ITEM_LIMIT       = D_ITEM_LIMIT;
+const char* ITEM_OFFSET      = D_ITEM_OFFSET;
+
 const char* COVER_BIG   = D_COVER_BIG;
 const char* COVER_SMALL = D_COVER_SMALL;
 
@@ -165,7 +168,7 @@ std::string Model::toJson() const {
   oss << "{\"" D_ITEM_ID     "\":" << id
       << ",\"" D_ITEM_NAME   "\":\"" << name
       << "\",\"" D_ITEM_GENRES "\":[";
-  char* delim = "";
+  const char* delim = "";
   for (auto& item : genres) {
     oss << delim << "\"" << item << "\"";
     delim = ",";
@@ -190,7 +193,7 @@ std::string Model::toJson() const {
 
 std::string Model::getGenresStr() const {
   std::ostringstream oss;
-  char* delim = "";
+  const char* delim = "";
   for (auto& item : genres) {
     oss << delim << item;
     delim = " ";

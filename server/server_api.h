@@ -38,7 +38,8 @@ class IServerApi {
 public:
   virtual ~IServerApi() {}
   virtual Model getModel(int64_t id) = 0;
-  virtual void getModels(std::vector<SmallModel>* const output) = 0;
+  virtual void getModels(std::vector<SmallModel>* const output, int limit, int offset) = 0;
+  virtual void getModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) = 0;
   virtual void getTitles(std::vector<std::string>* const output) = 0;
 };
 

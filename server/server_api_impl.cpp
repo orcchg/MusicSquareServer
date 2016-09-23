@@ -45,8 +45,12 @@ Model ServerApiImpl::getModel(int64_t id) {
   return m_db.getModel(id);
 }
 
-void ServerApiImpl::getModels(std::vector<SmallModel>* const output) {
-  m_db.getSmallModels(output);
+void ServerApiImpl::getModels(std::vector<SmallModel>* const output, int limit, int offset) {
+  m_db.getSmallModels(output, limit, offset);
+}
+
+void ServerApiImpl::getModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) {
+  m_db.getSmallModels(output, limit, offset, titles);
 }
 
 void ServerApiImpl::getTitles(std::vector<std::string>* const output) {

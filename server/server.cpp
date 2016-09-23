@@ -199,9 +199,16 @@ void Server::handleRequest(int socket) {
         switch (method) {
           case Method::GET:
             {
+              int limit = 0, offset = 0;
+              std::vector<std::string> genres;
+              parseParamsForAll(request.startline.path, &limit, &offset, &genres);
               INF("Get all");
               std::vector<SmallModel> models;
-              m_api_impl->getModels(&models);
+              if (genres.empty()) {
+                m_api_impl->getModels(&models, limit, offset);
+              } else {
+                m_api_impl->getModels(&models, limit, offset, genres);
+              }
               sendModels(socket, models);
             }
             break;
@@ -223,8 +230,8 @@ void Server::handleRequest(int socket) {
         switch (method) {
           case Method::GET:
             {
+              int64_t id = parseId(request.startline.path);
               INF("Get single");
-              int64_t id = parseId(request.startline.path.c_str());
               Model model = m_api_impl->getModel(id);
               if (model.isEmpty()) {
                 sendError(socket, 404, "Model not found");
@@ -302,7 +309,44 @@ int64_t Server::parseId(const std::string& path) {
     ERR("Wrong query params: %s", path.c_str());
     return 0;
   }
-  return std::stoll(params[0].value.c_str());
+  try {
+    return std::stoll(params[0].value.c_str());
+  } catch (std::invalid_argument e) {
+    FAT("Invalid id");
+    return 0;
+  }
+}
+
+void Server::parseParamsForAll(const std::string& path, int* limit, int* offset, std::vector<std::string>* titles) {
+  *limit = -1;  // all models
+  *offset = 0;
+  std::vector<Query> params;
+  m_parser.parsePath(path, &params);
+  for (auto& query : params) {
+    DBG("Query: %s: %s", query.key.c_str(), query.value.c_str());
+    if (query.key.compare(ITEM_LIMIT) == 0) {
+      try {
+        *limit = std::stoi(query.value.c_str());
+      } catch (std::invalid_argument e) {
+        FAT("Invalid limit, using default value: -1");
+      }
+    }
+    if (query.key.compare(ITEM_OFFSET) == 0) {
+      try {
+        *offset = std::stoi(query.value.c_str());
+      } catch (std::invalid_argument e) {
+        FAT("Invalid offset, using default value: 0");
+      }
+    }
+    if (query.key.compare(ITEM_GENRES) == 0) {
+      std::stringstream ss(query.value);
+      std::string item;
+      while (std::getline(ss, item, ',')) {
+        titles->push_back(item);
+        TRC("Parsed title: %s", item.c_str());
+      }
+    }
+  }
 }
 
 void Server::printClientInfo(sockaddr_in& peeraddr) {

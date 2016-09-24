@@ -289,7 +289,7 @@ void Server::sendTitles(int socket, const std::vector<std::string>& titles) cons
   std::ostringstream json;
   json << "[";
   for (auto& item : titles) {
-    json << delim << item;
+    json << delim << "\"" << item << "\"";
     delim = ",";
   }
   json << "]";

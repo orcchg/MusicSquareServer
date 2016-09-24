@@ -368,7 +368,7 @@ SmallModel ModelsDatabase::getSmallModelFromStatement() {
 void ModelsDatabase::getSmallModelsFromStatement(std::vector<SmallModel>* const output, const std::string& select_statement) {
   DBG("enter ModelsDatabase::getSmallModelsFromStatement()");
   this->__prepare_statement__(select_statement);
-  while (sqlite3_step(this->m_db_statement) != SQLITE_DONE) {
+  while (sqlite3_step(this->m_db_statement) == SQLITE_ROW) {
     SmallModel model = getSmallModelFromStatement();
     output->push_back(model);
   }

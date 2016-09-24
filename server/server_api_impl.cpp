@@ -34,7 +34,7 @@ ServerApiImpl::ServerApiImpl() {
               "dance", "disco", "dnb", "dubstep", "dub", "electronics", "estrada", "folk",
               "house", "indie", "industrial", "jazz", "latinfolk", "local-indie", "lounge",
               "metal", "newwave", "pop", "prog", "punk", "rap", "reggae", "relax", "rnb",
-              "rock","rosrap", "rusfolk", "rusrock", "soul", "soundtrack", "trance", "ukrrock",
+              "rock", "rusfolk", "rusrap", "rusrock", "soul", "soundtrack", "trance", "ukrrock",
               "urban", "videogame"};
 }
 

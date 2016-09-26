@@ -60,17 +60,20 @@ void DatabaseFixture::TearDown() {
 /* Tests */
 // ----------------------------------------------------------------------------
 TEST_F(DatabaseFixture, Add1) {
-  std::vector<Model> models = db->getModels();
+  std::vector<Model> models;
+  db->getModels(&models);
   EXPECT_EQ(6, models.size());
 }
 
 TEST_F(DatabaseFixture, Add2) {
-  std::vector<SmallModel> models = db->getSmallModels();
+  std::vector<SmallModel> models;
+  db->getSmallModels(&models);
   EXPECT_EQ(6, models.size());
 }
 
 TEST_F(DatabaseFixture, GetAllModels1) {
-  std::vector<Model> models = db->getModels();
+  std::vector<Model> models;
+  db->getModels(&models);
   EXPECT_EQ(Model::fromJson(user_1), models[0]);
   EXPECT_EQ(Model::fromJson(user_2), models[1]);
   EXPECT_EQ(Model::fromJson(user_3), models[2]);
@@ -80,7 +83,8 @@ TEST_F(DatabaseFixture, GetAllModels1) {
 }
 
 TEST_F(DatabaseFixture, GetAllModels2) {
-  std::vector<SmallModel> models = db->getSmallModels();
+  std::vector<SmallModel> models;
+  db->getSmallModels(&models);
   EXPECT_EQ(SmallModel::fromJson(user_0), models[0]);
 }
 

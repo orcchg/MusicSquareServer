@@ -46,5 +46,15 @@ std::string arrayToJson(const std::vector<const Jsonable*>& array) {
   return oss.str();
 }
 
+std::string whitespaceSeparated(const std::vector<std::string>& array) {
+  std::ostringstream oss;
+  const char* delim = "";
+  for (auto& item : array) {
+    oss << delim << item;
+    delim = " ";
+  }
+  return oss.str();
+}
+
 }  // namespace common
 

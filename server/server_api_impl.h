@@ -42,11 +42,11 @@ public:
   Model getModel(int64_t id) override;
   void getModels(std::vector<SmallModel>* const output, int limit, int offset) override;
   void getModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) override;
-  void getTitles(std::vector<std::string>* const output) override;
+  void getGenres(std::vector<Genre>* const output) override;
 
 private:
   db::ModelsDatabase m_db;
-  std::vector<std::string> m_titles;
+  std::vector<Genre> m_genres;
 };
 
 #endif  // MSQ_SERVER_API_IMPL__H__

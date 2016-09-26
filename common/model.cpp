@@ -69,7 +69,7 @@ SmallModel SmallModel::fromJson(const std::string& json) {
     model.name = document[ITEM_NAME].GetString();
     model.cover_small = document[ITEM_COVER].GetString();
   } else {
-    ERR("Failed to parse model from json: %s", json.c_str());
+    ERR("Failed to parse small model from json: %s", json.c_str());
   }
 
   return model;
@@ -140,9 +140,7 @@ Model Model::fromJson(const std::string& json) {
     const char* kTypeNames[] = { COVER_BIG, COVER_SMALL };
     model.covers[COVER_BIG] = document[ITEM_COVER][COVER_BIG].GetString();
     model.covers[COVER_SMALL] = document[ITEM_COVER][COVER_SMALL].GetString();
-    for (rapidjson::Value::ConstMemberIterator it = document[ITEM_COVER].MemberBegin(); it != document[ITEM_COVER].MemberEnd(); ++it) {
-      
-    }
+    //for (rapidjson::Value::ConstMemberIterator it = document[ITEM_COVER].MemberBegin(); it != document[ITEM_COVER].MemberEnd(); ++it) {}
   } else {
     ERR("Failed to parse model from json: %s", json.c_str());
   }
@@ -192,12 +190,58 @@ std::string Model::toJson() const {
 }
 
 std::string Model::getGenresStr() const {
+  return common::whitespaceSeparated(genres);
+}
+
+// ----------------------------------------------
+Genre::Genre(const Genre::Builder& builder)
+  : name(builder.name)
+  , genres(builder.genres) {
+}
+
+std::string Genre::toString() const {
+  return toJson();
+}
+
+Genre Genre::fromJson(const std::string& json) {
+  rapidjson::Document document;
+  document.Parse(json.c_str());
+
+  Genre model;
+
+  if (document.IsObject() &&
+      document.HasMember(ITEM_NAME) && document[ITEM_NAME].IsString() &&
+      document.HasMember(ITEM_GENRES) && document[ITEM_GENRES].IsArray()) {
+    model.name = document[ITEM_NAME].GetString();
+    const rapidjson::Value& genres = document[ITEM_GENRES];
+    for (rapidjson::SizeType i = 0; i < genres.Size(); ++i) {
+      std::string genre = genres[i].GetString();
+      model.genres.push_back(genre);
+    }
+  } else {
+    ERR("Failed to parse genre from json: %s", json.c_str());
+  }
+
+  return model;
+}
+
+/**
+ * {"name":"rock","genres":["rock","rusrock","ukrrock"]}
+ */
+std::string Genre::toJson() const {
   std::ostringstream oss;
+  oss << "{\"" D_ITEM_NAME "\":\"" << name
+      << "\",\"" D_ITEM_GENRES "\":[";
   const char* delim = "";
   for (auto& item : genres) {
-    oss << delim << item;
-    delim = " ";
+    oss << delim << "\"" << item << "\"";
+    delim = ",";
   }
+  oss << "]}";
   return oss.str();
+}
+
+std::string Genre::getGenresStr() const {
+  return common::whitespaceSeparated(genres);
 }
 

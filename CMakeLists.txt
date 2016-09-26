@@ -26,7 +26,7 @@
 
 cmake_minimum_required( VERSION 2.8 )
 PROJECT( MusicSquareServer )
-SET( D_VERSION "1.0.0" )
+SET( D_VERSION "1.1.0" )
 MESSAGE( STATUS "Version ${D_VERSION}" )
 
 # -----------------------------------------------------------------------------

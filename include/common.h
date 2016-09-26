@@ -68,6 +68,7 @@ struct Jsonable {
 };
 
 std::string arrayToJson(const std::vector<const Jsonable*>& array);
+std::string whitespaceSeparated(const std::vector<std::string>& array);
 
 }  // namespace common
 

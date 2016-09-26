@@ -219,9 +219,9 @@ void Server::handleRequest(int socket) {
           case Method::GET:
             {
               INF("Get genres");
-              std::vector<std::string> genres;
-              m_api_impl->getTitles(&genres);
-              sendTitles(socket, genres);
+              std::vector<Genre> genres;
+              m_api_impl->getGenres(&genres);
+              sendGenres(socket, genres);
             }
             break;
         }
@@ -284,17 +284,15 @@ void Server::sendModel(int socket, const Model& model) const {
   sendToSocket(socket, json);
 }
 
-void Server::sendTitles(int socket, const std::vector<std::string>& titles) const {
-  const char* delim = "";
-  std::ostringstream json;
-  json << "[";
-  for (auto& item : titles) {
-    json << delim << "\"" << item << "\"";
-    delim = ",";
+void Server::sendGenres(int socket, const std::vector<Genre>& genres) const {
+  std::vector<const common::Jsonable*> ptrs;
+  ptrs.reserve(genres.size());
+  for (auto& item : genres) {
+    ptrs.push_back(&item);
+    VER("Send genre: %s", item.toString().c_str());
   }
-  json << "]";
-  VER("Send titles: %s", json.str().c_str());
-  sendToSocket(socket, json.str());
+  std::string json = common::arrayToJson(ptrs);
+  sendToSocket(socket, json);
 }
 
 /* Utility */

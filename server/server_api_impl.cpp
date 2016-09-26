@@ -30,12 +30,38 @@
 #include "server_api_impl.h"
 
 ServerApiImpl::ServerApiImpl() {
-  m_titles = {"alternative", "african", "bard", "blues", "classical", "conjazz", "country",
-              "dance", "disco", "dnb", "dubstep", "dub", "electronics", "estrada", "folk",
-              "house", "indie", "industrial", "jazz", "latinfolk", "local-indie", "lounge",
-              "metal", "newwave", "pop", "prog", "punk", "rap", "reggae", "relax", "rnb",
-              "rock", "rusfolk", "rusrap", "rusrock", "soul", "soundtrack", "trance", "ukrrock",
-              "urban", "videogame"};
+  /**
+   * {"alternative", "african", "bard", "blues", "classical", "conjazz", "country",
+   *  "dance", "disco", "dnb", "dubstep", "dub", "electronics", "estrada", "folk",
+   *  "house", "indie", "industrial", "jazz", "latinfolk", "local-indie", "lounge",
+   *  "metal", "newwave", "pop", "prog", "punk", "rap", "reggae", "relax", "rnb",
+   *  "rock", "rusfolk", "rusrap", "rusrock", "soul", "soundtrack", "trance", "ukrrock",
+   *  "urban", "videogame"}
+   */
+  m_genres.emplace_back("alternative");
+  m_genres.emplace_back(Genre::Builder("african").addGenre("soul"));
+  m_genres.emplace_back("bard");
+  m_genres.emplace_back(Genre::Builder("jazz").addGenre("blues").addGenre("conjazz").addGenre("country"));
+  m_genres.emplace_back("classical");
+  m_genres.emplace_back(Genre::Builder("dance").addGenre("disco").addGenre("trance"));
+  m_genres.emplace_back(Genre::Builder("dubstep").addGenre("dub"));
+  m_genres.emplace_back("dnb");
+  m_genres.emplace_back(Genre::Builder("electronics").addGenre("house"));
+  m_genres.emplace_back(Genre::Builder("pop").addGenre("estrada"));
+  m_genres.emplace_back(Genre::Builder("folk").addGenre("latinfolk").addGenre("rusfolk"));
+  m_genres.emplace_back(Genre::Builder("indie").addGenre("local-indie"));
+  m_genres.emplace_back("industrial");
+  m_genres.emplace_back("lounge");
+  m_genres.emplace_back("metal");
+  m_genres.emplace_back("newwave");
+  m_genres.emplace_back("prog");
+  m_genres.emplace_back("punk");
+  m_genres.emplace_back(Genre::Builder("rap").addGenre("rusrap"));
+  m_genres.emplace_back("reggae");
+  m_genres.emplace_back("relax");
+  m_genres.emplace_back(Genre::Builder("rnb").addGenre("urban"));
+  m_genres.emplace_back(Genre::Builder("rock").addGenre("rusrock").addGenre("ukrrock"));
+  m_genres.emplace_back(Genre::Builder("soundtrack").addGenre("videogame"));
 }
 
 ServerApiImpl::~ServerApiImpl() {
@@ -53,7 +79,7 @@ void ServerApiImpl::getModels(std::vector<SmallModel>* const output, int limit, 
   m_db.getSmallModels(output, limit, offset, titles);
 }
 
-void ServerApiImpl::getTitles(std::vector<std::string>* const output) {
-  std::copy(m_titles.begin(), m_titles.end(), std::back_inserter(*output));
+void ServerApiImpl::getGenres(std::vector<Genre>* const output) {
+  std::copy(m_genres.begin(), m_genres.end(), std::back_inserter(*output));
 }
 

@@ -126,6 +126,7 @@ public:
   public:
     Builder(int64_t id, const std::string& name) : id(id), name(name) {}
     Builder& setGenres(const std::vector<std::string>& genres) { this->genres = genres;  return *this; }
+    Builder& addGenre(const std::string& genre)                { this->genres.push_back(genre);  return *this; }
     Builder& setTracksCount(int count)                         { tracks_count = count;   return *this; }
     Builder& setAlbumsCount(int count)                         { albums_count = count;   return *this; }
     Builder& setWebLink(const std::string& link)               { web_link = link;  return *this; }
@@ -180,6 +181,41 @@ public:
   bool operator != (const Model& rhs) const { return !(*this == rhs); }
 
   inline bool isEmpty() const { return id == 0; }
+};
+
+// ----------------------------------------------
+class Genre : public common::Jsonable {
+  std::string name;
+  std::vector<std::string> genres;
+
+public:
+  Genre() {}
+  Genre(const std::string& name) : name(name) { this->genres.push_back(name); }
+  virtual ~Genre() {}
+
+  class Builder {
+    friend class Genre;
+  public:
+    Builder(const std::string& name) : name(name) { this->genres.push_back(name); }
+    Builder& setGenres(const std::vector<std::string>& genres) { this->genres = genres;  return *this; }
+    Builder& addGenre(const std::string& genre) { this->genres.push_back(genre);  return *this; }
+    Genre build() { return Genre(*this); }
+
+  private:
+    std::string name;
+    std::vector<std::string> genres;
+  };
+
+  Genre(const Genre::Builder& builder);
+
+  std::string toString() const;
+  std::string toJson() const override final;
+  static Genre fromJson(const std::string& json);
+
+  inline const std::string& getName() const { return name; }
+  inline const std::vector<std::string>& getGenres() const { return genres; }
+
+  std::string getGenresStr() const;
 };
 
 #endif  // MSQ_MODEL__H__

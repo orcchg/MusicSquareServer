@@ -30,6 +30,7 @@
 #define MSQ_SERVER__H__
 
 #include <unordered_map>
+#include <vector>
 #include "all.h"
 #include "common.h"
 #include "parser/my_parser.h"
@@ -60,7 +61,7 @@ private:
   std::unordered_map<std::string, Path> m_paths;
 
   void runListener();
-  Request getRequest(int socket, bool* is_closed);
+  Request getRequest(int socket, bool* is_closed, std::vector<Request>* requests);
   Method getMethod(const std::string& method) const;
   Path getPath(const std::string& path) const;
   void handleRequest(int socket);

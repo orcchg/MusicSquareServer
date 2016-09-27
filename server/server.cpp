@@ -127,7 +127,7 @@ void Server::runListener() {
 
 /* Process request */
 // ----------------------------------------------
-Request Server::getRequest(int socket, bool* is_closed) {
+Request Server::getRequest(int socket, bool* is_closed, std::vector<Request>* requests) {
   char buffer[MESSAGE_SIZE];
   memset(buffer, 0, MESSAGE_SIZE);
   int read_bytes = recv(socket, buffer, MESSAGE_SIZE, 0);
@@ -141,7 +141,7 @@ Request Server::getRequest(int socket, bool* is_closed) {
   }
   try {
     DBG("Raw request[%i bytes]: %.*s", read_bytes, (int) read_bytes, buffer);
-    return m_parser.parseRequest(buffer, read_bytes);
+    return m_parser.parseBufferedRequests(buffer, read_bytes, requests);
   } catch (ParseException exception) {
     FAT("ParseException on raw request[%i bytes]: %.*s", read_bytes, (int) read_bytes, buffer);
     return Request::EMPTY;
@@ -169,7 +169,8 @@ Path Server::getPath(const std::string& path) const {
 void Server::handleRequest(int socket) {
   while (!m_is_stopped) {
     bool is_closed = false;
-    Request request = getRequest(socket, &is_closed);
+    std::vector<Request> requests;
+    Request request = getRequest(socket, &is_closed, &requests);
     if (is_closed) {
       DBG("Stopping peer thread...");
       close(socket);
@@ -180,6 +181,13 @@ void Server::handleRequest(int socket) {
       ERR("Empty request - ignored");
       continue;
     }
+
+    /* process requests step-by-step */
+    bool interruption = false;
+    size_t total = requests.size();
+    for (size_t i = 0; !interruption && i < total; ++i) {
+      VER("Processing request: %zu / %zu", i + 1, total);
+      Request& request = requests[i];
 
     Method method = getMethod(request.startline.method);
     if (method == Method::UNKNOWN) {
@@ -243,7 +251,9 @@ void Server::handleRequest(int socket) {
         }
         break;
     }
-  }
+    }  // for loop ending
+
+  }  // while loop ending
 }
 
 /* Send response */

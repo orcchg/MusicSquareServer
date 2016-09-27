@@ -189,68 +189,68 @@ void Server::handleRequest(int socket) {
       VER("Processing request: %zu / %zu", i + 1, total);
       Request& request = requests[i];
 
-    Method method = getMethod(request.startline.method);
-    if (method == Method::UNKNOWN) {
-      ERR("Invalid method: %s", request.startline.method.c_str());
-      continue;
-    }
+      Method method = getMethod(request.startline.method);
+      if (method == Method::UNKNOWN) {
+        ERR("Invalid method: %s", request.startline.method.c_str());
+        continue;
+      }
 
-    Path path = getPath(request.startline.path);
-    if (path == Path::UNKNOWN) {
-      ERR("Invalid path: %s", request.startline.path.c_str());
-      continue;
-    }
-    VER("Method: %i, Path: %i", static_cast<int>(method), static_cast<int>(path));
+      Path path = getPath(request.startline.path);
+      if (path == Path::UNKNOWN) {
+        ERR("Invalid path: %s", request.startline.path.c_str());
+        continue;
+      }
+      VER("Method: %i, Path: %i", static_cast<int>(method), static_cast<int>(path));
 
-    switch (path) {
-      case Path::ALL:
-        switch (method) {
-          case Method::GET:
-            {
-              int limit = 0, offset = 0;
-              std::vector<std::string> genres;
-              parseParamsForAll(request.startline.path, &limit, &offset, &genres);
-              INF("Get all");
-              std::vector<SmallModel> models;
-              if (genres.empty()) {
-                m_api_impl->getModels(&models, limit, offset);
-              } else {
-                m_api_impl->getModels(&models, limit, offset, genres);
+      switch (path) {
+        case Path::ALL:
+          switch (method) {
+            case Method::GET:
+              {
+                int limit = 0, offset = 0;
+                std::vector<std::string> genres;
+                parseParamsForAll(request.startline.path, &limit, &offset, &genres);
+                INF("Get all");
+                std::vector<SmallModel> models;
+                if (genres.empty()) {
+                  m_api_impl->getModels(&models, limit, offset);
+                } else {
+                  m_api_impl->getModels(&models, limit, offset, genres);
+                }
+                sendModels(socket, models);
               }
-              sendModels(socket, models);
-            }
-            break;
-        }
-        break;
-      case Path::GENRES:
-        switch (method) {
-          case Method::GET:
-            {
-              INF("Get genres");
-              std::vector<Genre> genres;
-              m_api_impl->getGenres(&genres);
-              sendGenres(socket, genres);
-            }
-            break;
-        }
-        break;
-      case Path::SINGLE:
-        switch (method) {
-          case Method::GET:
-            {
-              int64_t id = parseId(request.startline.path);
-              INF("Get single");
-              Model model = m_api_impl->getModel(id);
-              if (model.isEmpty()) {
-                sendError(socket, 404, "Model not found");
-              } else {
-                sendModel(socket, model);
+              break;
+          }
+          break;
+        case Path::GENRES:
+          switch (method) {
+            case Method::GET:
+              {
+                INF("Get genres");
+                std::vector<Genre> genres;
+                m_api_impl->getGenres(&genres);
+                sendGenres(socket, genres);
               }
-            }
-            break;
-        }
-        break;
-    }
+              break;
+          }
+          break;
+        case Path::SINGLE:
+          switch (method) {
+            case Method::GET:
+              {
+                int64_t id = parseId(request.startline.path);
+                INF("Get single");
+                Model model = m_api_impl->getModel(id);
+                if (model.isEmpty()) {
+                  sendError(socket, 404, "Model not found");
+                } else {
+                  sendModel(socket, model);
+                }
+              }
+              break;
+          }
+          break;
+      }
     }  // for loop ending
 
   }  // while loop ending

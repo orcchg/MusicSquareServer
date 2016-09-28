@@ -45,6 +45,7 @@
 
 #define D_ITEM_LIMIT        "limit"
 #define D_ITEM_OFFSET       "offset"
+#define D_ITEM_VALUE        "value"
 
 #define D_COVER_BIG   "big"
 #define D_COVER_SMALL "small"
@@ -60,6 +61,7 @@ extern const char* ITEM_COVER;
 
 extern const char* ITEM_LIMIT;
 extern const char* ITEM_OFFSET;
+extern const char* ITEM_VALUE;
 
 extern const char* COVER_BIG;
 extern const char* COVER_SMALL;

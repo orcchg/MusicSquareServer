@@ -67,6 +67,15 @@ ServerApiImpl::ServerApiImpl() {
 ServerApiImpl::~ServerApiImpl() {
 }
 
+int ServerApiImpl::getTotalModels() {
+  return m_db.getTotalModels();
+}
+
+int ServerApiImpl::getTotalModels(const std::vector<std::string>& titles) {
+  if (titles.empty()) return m_db.getTotalModels();
+  return m_db.getTotalModels(titles);
+}
+
 Model ServerApiImpl::getModel(int64_t id) {
   return m_db.getModel(id);
 }

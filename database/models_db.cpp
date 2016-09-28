@@ -125,7 +125,7 @@ int64_t ModelsDatabase::addModel(const Model& model) {
   DBG("Model cover small ["%s"] has been stored in table ["%s"], SQLite database ["%s"].",
       i_cover_small.c_str(), this->m_table_name.c_str(), this->m_db_name.c_str());
 
-  sqlite3_step(this->m_db_statement);
+  if (sqlite3_step(this->m_db_statement) != SQLITE_DONE) { ERR("Error addModel"); }
   if (!accumulate) {
     ERR("Error during saving data into table ["%s"], database ["%s"] by statement ["%s"]!",
         this->m_table_name.c_str(), this->m_db_name.c_str(), insert_statement.c_str());
@@ -142,14 +142,14 @@ int64_t ModelsDatabase::addModel(const Model& model) {
 
 // ----------------------------------------------
 void ModelsDatabase::removeModel(int64_t id) {
-  INF("enter ModelsDatabase::removeModel().");
+  INF("enter ModelsDatabase::removeModel(%li).", id);
   std::string delete_statement = "DELETE FROM '";
   delete_statement += this->m_table_name;
   delete_statement += "' WHERE ID == '";
   delete_statement += std::to_string(id);
   delete_statement += "';";
   this->__prepare_statement__(delete_statement);
-  sqlite3_step(this->m_db_statement);
+  if (sqlite3_step(this->m_db_statement) != SQLITE_DONE) { ERR("Error removeModel"); }
   this->__finalize__(delete_statement.c_str());
   this->__decrement_rows__();
   if (id + 1 == this->m_next_id) {
@@ -162,12 +162,12 @@ void ModelsDatabase::removeModel(int64_t id) {
     this->m_next_id = BASE_ID;
   }
   DBG("Deleted model [ID: %li] in table ["%s"].", id, this->m_table_name.c_str());
-  INF("exit ModelsDatabase::removeModel().");
+  INF("exit ModelsDatabase::removeModel(%li).", id);
 }
 
 // ----------------------------------------------
 Model ModelsDatabase::getModel(int64_t i_model_id) {
-  INF("enter ModelsDatabase::getModel().");
+  INF("enter ModelsDatabase::getModel(%li).", i_model_id);
   std::string select_statement = "SELECT * FROM '";
   select_statement += this->m_table_name;
   select_statement += "' WHERE " D_COLUMN_NAME_MODEL_ID " == '";
@@ -175,11 +175,11 @@ Model ModelsDatabase::getModel(int64_t i_model_id) {
   select_statement += "';";
 
   this->__prepare_statement__(select_statement);
-  sqlite3_step(this->m_db_statement);
+  if (sqlite3_step(this->m_db_statement) != SQLITE_DONE) { ERR("Error getModel"); }
   Model model = getModelFromStatement();
   //TABLE_ASSERT("Input model ID does not equal to primary key value from database!" && model.getId() == i_model_id);
   this->__finalize__(select_statement.c_str());
-  INF("exit ModelsDatabase::getModel().");
+  INF("exit ModelsDatabase::getModel(%li).", i_model_id);
   return (model);
 }
 
@@ -190,7 +190,7 @@ void ModelsDatabase::getModels(std::vector<Model>* const output) {
   select_statement += "';";
 
   this->__prepare_statement__(select_statement);
-  while (sqlite3_step(this->m_db_statement) != SQLITE_DONE) {
+  while (sqlite3_step(this->m_db_statement) == SQLITE_ROW) {
     Model model = getModelFromStatement();
     output->push_back(model);
   }
@@ -200,7 +200,7 @@ void ModelsDatabase::getModels(std::vector<Model>* const output) {
 
 // ----------------------------------------------
 SmallModel ModelsDatabase::getSmallModel(int64_t i_model_id) {
-  INF("enter ModelsDatabase::getSmallModel().");
+  INF("enter ModelsDatabase::getSmallModel(%li).", i_model_id);
   std::string select_statement = "SELECT " D_COLUMN_NAME_ROW_ID "," D_COLUMN_NAME_MODEL_ID "," D_COLUMN_NAME_MODEL_NAME "," D_COLUMN_NAME_MODEL_COVER_SMALL " FROM '";
   select_statement += this->m_table_name;
   select_statement += "' WHERE " D_COLUMN_NAME_MODEL_ID " == '";
@@ -208,11 +208,11 @@ SmallModel ModelsDatabase::getSmallModel(int64_t i_model_id) {
   select_statement += "';";
 
   this->__prepare_statement__(select_statement);
-  sqlite3_step(this->m_db_statement);
+  if (sqlite3_step(this->m_db_statement) != SQLITE_DONE) { ERR("Error getSmallModel"); }
   SmallModel model = getSmallModelFromStatement();
   //TABLE_ASSERT("Input model ID does not equal to primary key value from database!" && model.getId() == i_model_id);
   this->__finalize__(select_statement.c_str());
-  INF("exit ModelsDatabase::getSmallModel().");
+  INF("exit ModelsDatabase::getSmallModel(%li).", i_model_id);
   return (model);
 }
 
@@ -227,7 +227,7 @@ void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output) {
 }
 
 void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output, int limit, int offset) {
-  INF("enter ModelsDatabase::getSmallModels()");
+  INF("enter ModelsDatabase::getSmallModels(%i, %i).", limit, offset);
   std::string select_statement = "SELECT " D_COLUMN_NAME_ROW_ID "," D_COLUMN_NAME_MODEL_ID "," D_COLUMN_NAME_MODEL_NAME "," D_COLUMN_NAME_MODEL_COVER_SMALL " FROM '";
   select_statement += this->m_table_name;
   select_statement += "' LIMIT ";
@@ -237,11 +237,11 @@ void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output, int l
   select_statement += ";";
 
   getSmallModelsFromStatement(output, select_statement);
-  INF("exit ModelsDatabase::getSmallModels()");
+  INF("exit ModelsDatabase::getSmallModels(%i, %i).", limit, offset);
 }
 
 void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) {
-  INF("enter ModelsDatabase::getSmallModels()");
+  INF("enter ModelsDatabase::getSmallModels(%i, %i, titles).", limit, offset);
   std::ostringstream oss;
   const char* delim = "";
   for (auto& item : titles) {
@@ -260,7 +260,36 @@ void ModelsDatabase::getSmallModels(std::vector<SmallModel>* const output, int l
   select_statement += ";";
 
   getSmallModelsFromStatement(output, select_statement);
-  INF("exit ModelsDatabase::getSmallModels()");
+  INF("exit ModelsDatabase::getSmallModels(%i, %i, titles).", limit, offset);
+}
+
+int ModelsDatabase::getTotalModels() {
+  INF("enter ModelsDatabase::getTotalModels().");
+  std::string count_statement = "SELECT COUNT(*) FROM '";
+  count_statement += this->m_table_name;
+  count_statement += "';";
+
+  return getTotalModelsFromStatement(count_statement);
+  INF("exit ModelsDatabase::getTotalModels().");
+}
+
+int ModelsDatabase::getTotalModels(const std::vector<std::string>& titles) {
+  INF("enter ModelsDatabase::getTotalModels(titles).");
+  std::ostringstream oss;
+  const char* delim = "";
+  for (auto& item : titles) {
+    oss << delim << COLUMN_NAME_MODEL_GENRES << " LIKE '%" << item << "%'";
+    delim = " OR ";
+  }
+
+  std::string count_statement = "SELECT COUNT(*) FROM '";
+  count_statement += this->m_table_name;
+  count_statement += "' WHERE ";
+  count_statement += oss.str();
+  count_statement += ";";
+
+  return getTotalModelsFromStatement(count_statement);
+  INF("exit ModelsDatabase::getTotalModels(titles).");
 }
 
 /* Private members */
@@ -290,14 +319,14 @@ void ModelsDatabase::__create_table__() {
       "'" D_COLUMN_NAME_MODEL_COVER_BIG "' TEXT,"
       "'" D_COLUMN_NAME_MODEL_COVER_SMALL "' TEXT);";
   this->__prepare_statement__(statement);
-  sqlite3_step(this->m_db_statement);
+  if (sqlite3_step(this->m_db_statement) != SQLITE_DONE) { ERR("Error during creating table!"); }
   DBG("Table ["%s"] has been successfully created.", this->m_table_name.c_str());
   this->__finalize__(statement.c_str());
   DBG("exit ModelsDatabase::__create_table__().");
 }
 
 Model ModelsDatabase::getModelFromStatement() {
-  DBG("enter ModelsDatabase::getModelFromStatement()");
+  DBG("enter ModelsDatabase::getModelFromStatement().");
   int64_t row_id = sqlite3_column_int64(this->m_db_statement, 0);
   int64_t model_id = sqlite3_column_int64(this->m_db_statement, 1);
 
@@ -338,12 +367,12 @@ Model ModelsDatabase::getModelFromStatement() {
         model_id, this->m_table_name.c_str(), this->m_db_handler);
   }
 
-  DBG("exit ModelsDatabase::getModelFromStatement()");
+  DBG("exit ModelsDatabase::getModelFromStatement().");
   return (model);
 }
 
 SmallModel ModelsDatabase::getSmallModelFromStatement() {
-  DBG("enter ModelsDatabase::getSmallModelFromStatement()");
+  DBG("enter ModelsDatabase::getSmallModelFromStatement().");
   int64_t row_id = sqlite3_column_int64(this->m_db_statement, 0);
   int64_t model_id = sqlite3_column_int64(this->m_db_statement, 1);
 
@@ -361,19 +390,33 @@ SmallModel ModelsDatabase::getSmallModelFromStatement() {
         model_id, this->m_table_name.c_str(), this->m_db_handler);
   }
 
-  DBG("exit ModelsDatabase::getSmallModelFromStatement()");
+  DBG("exit ModelsDatabase::getSmallModelFromStatement().");
   return (model);
 }
 
 void ModelsDatabase::getSmallModelsFromStatement(std::vector<SmallModel>* const output, const std::string& select_statement) {
-  DBG("enter ModelsDatabase::getSmallModelsFromStatement()");
+  DBG("enter ModelsDatabase::getSmallModelsFromStatement().");
   this->__prepare_statement__(select_statement);
   while (sqlite3_step(this->m_db_statement) == SQLITE_ROW) {
     SmallModel model = getSmallModelFromStatement();
     output->push_back(model);
   }
   this->__finalize__(select_statement.c_str());
-  DBG("exit ModelsDatabase::getSmallModelsFromStatement()");
+  DBG("exit ModelsDatabase::getSmallModelsFromStatement().");
+}
+
+int ModelsDatabase::getTotalModelsFromStatement(const std::string& count_statement) {
+  DBG("enter ModelsDatabase::getTotalModelsFromStatement().");
+  int total = -1;
+  this->__prepare_statement__(count_statement);
+  if (sqlite3_step(this->m_db_statement) == SQLITE_ROW) {
+    total = sqlite3_column_int(this->m_db_statement, 0);
+    DBG("Total models: %i", total);
+  } else {
+    ERR("Error counting total models!");
+  }
+  DBG("exit ModelsDatabase::getTotalModelsFromStatement().");
+  return (total);
 }
 
 }  // namespace db

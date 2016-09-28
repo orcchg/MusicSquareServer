@@ -73,6 +73,7 @@ Server::Server(int port)
   m_paths[PATH_ALL]    = Path::ALL;
   m_paths[PATH_GENRES] = Path::GENRES;
   m_paths[PATH_SINGLE] = Path::SINGLE;
+  m_paths[PATH_TOTAL]  = Path::TOTAL;
 
   m_api_impl = new ServerApiImpl();
 }
@@ -250,6 +251,19 @@ void Server::handleRequest(int socket) {
               break;
           }
           break;
+        case Path::TOTAL:
+          switch (method) {
+            case Method::GET:
+              {
+                std::vector<std::string> genres;
+                parseParamsGenres(request.startline.path, &genres);
+                INF("Get total");
+                int total = m_api_impl->getTotalModels(genres);
+                sendIntValue(socket, total);
+              }
+              break;
+          }
+          break;
       }
     }  // for loop ending
 
@@ -275,6 +289,12 @@ void Server::sendError(int socket, int error_code, const std::string& message) c
       << STANDARD_HEADERS << "\r\n\r\n\0";
   MSG("Response: %s", oss.str().c_str());
   send(socket, oss.str().c_str(), oss.str().length(), 0);
+}
+
+void Server::sendIntValue(int socket, int value) const {
+  std::ostringstream json;
+  json << "{\"" D_ITEM_VALUE "\":" << value << "}";
+  sendToSocket(socket, json.str());
 }
 
 void Server::sendModels(int socket, const std::vector<SmallModel>& models) const {
@@ -325,7 +345,26 @@ int64_t Server::parseId(const std::string& path) {
   }
 }
 
-void Server::parseParamsForAll(const std::string& path, int* limit, int* offset, std::vector<std::string>* titles) {
+void Server::parseGenresFromQuery(const Query& query, std::vector<std::string>* genres) {
+  if (query.key.compare(ITEM_GENRES) == 0) {
+    std::stringstream ss(query.value);
+    std::string item;
+    while (std::getline(ss, item, ',')) {
+      genres->push_back(item);
+      TRC("Parsed genre: %s", item.c_str());
+    }
+  }
+}
+
+void Server::parseParamsGenres(const std::string& path, std::vector<std::string>* genres) {
+  std::vector<Query> params;
+  m_parser.parsePath(path, &params);
+  if (!params.empty()) {
+    parseGenresFromQuery(params[0], genres);
+  }
+}
+
+void Server::parseParamsForAll(const std::string& path, int* limit, int* offset, std::vector<std::string>* genres) {
   *limit = -1;  // all models
   *offset = 0;
   std::vector<Query> params;
@@ -346,14 +385,7 @@ void Server::parseParamsForAll(const std::string& path, int* limit, int* offset,
         FAT("Invalid offset, using default value: 0");
       }
     }
-    if (query.key.compare(ITEM_GENRES) == 0) {
-      std::stringstream ss(query.value);
-      std::string item;
-      while (std::getline(ss, item, ',')) {
-        titles->push_back(item);
-        TRC("Parsed title: %s", item.c_str());
-      }
-    }
+    parseGenresFromQuery(query, genres);
   }
 }
 

@@ -40,6 +40,7 @@ const char* ITEM_COVER       = D_ITEM_COVER;
 
 const char* ITEM_LIMIT       = D_ITEM_LIMIT;
 const char* ITEM_OFFSET      = D_ITEM_OFFSET;
+const char* ITEM_VALUE       = D_ITEM_VALUE;
 
 const char* COVER_BIG   = D_COVER_BIG;
 const char* COVER_SMALL = D_COVER_SMALL;

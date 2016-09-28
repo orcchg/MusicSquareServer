@@ -34,31 +34,37 @@
 #include <vector>
 
 /**
- * GET /all?limit=20&offset=25&genres=rap,rnb,rock
+ *  GET /all?limit=20&offset=25&genres=rap,rnb,rock
  */
 
 /**
- * GET /genres
+ *  GET /genres
  */
 
 /**
  *  GET /single?id=100500
  */
 
+/**
+ *  GET /total?genres=rap,rnb,rock
+ */
+
 #define D_PATH_ALL    "/all"
 #define D_PATH_GENRES "/genres"
 #define D_PATH_SINGLE "/single"
+#define D_PATH_TOTAL  "/total"
 
 extern const char* PATH_ALL;
 extern const char* PATH_GENRES;
 extern const char* PATH_SINGLE;
+extern const char* PATH_TOTAL;
 
 enum class Method : int {
   UNKNOWN = -1, GET = 0, POST = 1, PUT = 2, DELETE = 3
 };
 
 enum class Path : int {
-  UNKNOWN = -1, ALL = 0, GENRES = 1, SINGLE = 2
+  UNKNOWN = -1, ALL = 0, GENRES = 1, SINGLE = 2, TOTAL = 3
 };
 
 namespace common {

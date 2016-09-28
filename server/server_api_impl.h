@@ -39,6 +39,8 @@ class ServerApiImpl : public IServerApi {
 public:
   ServerApiImpl();
   ~ServerApiImpl();
+  int getTotalModels() override;
+  int getTotalModels(const std::vector<std::string>& titles) override;
   Model getModel(int64_t id) override;
   void getModels(std::vector<SmallModel>* const output, int limit, int offset) override;
   void getModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) override;

@@ -89,7 +89,7 @@ public:
     std::string cover_small;
   };
 
-  SmallModel(const SmallModel::Builder& builder);
+  explicit SmallModel(const SmallModel::Builder& builder);
 
   std::string toString() const;
   std::string toJson() const override final;
@@ -148,7 +148,7 @@ public:
     std::unordered_map<std::string, std::string> covers;
   };
 
-  Model(const Model::Builder& builder);
+  explicit Model(const Model::Builder& builder);
 
   std::string toString() const;
   std::string toJson() const override final;
@@ -192,7 +192,7 @@ class Genre : public common::Jsonable {
 
 public:
   Genre() {}
-  Genre(const std::string& name) : name(name) { this->genres.push_back(name); }
+  explicit Genre(const std::string& name) : name(name) { this->genres.push_back(name); }
   virtual ~Genre() {}
 
   class Builder {
@@ -208,7 +208,7 @@ public:
     std::vector<std::string> genres;
   };
 
-  Genre(const Genre::Builder& builder);
+  explicit Genre(const Genre::Builder& builder);
 
   std::string toString() const;
   std::string toJson() const override final;
@@ -218,6 +218,15 @@ public:
   inline const std::vector<std::string>& getGenres() const { return genres; }
 
   std::string getGenresStr() const;
+
+  bool operator == (const Genre& rhs) const { return name.compare(rhs.name) == 0; }
+  bool operator != (const Genre& rhs) const { return name.compare(rhs.name) != 0; }
+  bool operator <  (const Genre& rhs) const { return name.compare(rhs.name) <  0; }
+  bool operator <= (const Genre& rhs) const { return name.compare(rhs.name) <= 0; }
+  bool operator >  (const Genre& rhs) const { return name.compare(rhs.name) >  0; }
+  bool operator >= (const Genre& rhs) const { return name.compare(rhs.name) >= 0; }
+
+  inline bool isEmpty() { return genres.empty(); }
 };
 
 #endif  // MSQ_MODEL__H__

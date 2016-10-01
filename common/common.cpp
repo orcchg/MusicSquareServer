@@ -30,8 +30,10 @@
 
 const char* PATH_ALL    = D_PATH_ALL;
 const char* PATH_GENRES = D_PATH_GENRES;
+const char* PATH_GENRE  = D_PATH_GENRE;
 const char* PATH_SINGLE = D_PATH_SINGLE;
 const char* PATH_TOTAL  = D_PATH_TOTAL;
+const char* PATH_TOTAL_GENRES = D_PATH_TOTAL_GENRES;
 
 namespace common {
 

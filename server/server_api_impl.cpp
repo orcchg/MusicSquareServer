@@ -27,6 +27,7 @@
  */
 
 #include <algorithm>
+#include "common.h"
 #include "server_api_impl.h"
 
 ServerApiImpl::ServerApiImpl() {
@@ -67,6 +68,10 @@ ServerApiImpl::ServerApiImpl() {
 ServerApiImpl::~ServerApiImpl() {
 }
 
+int ServerApiImpl::getTotalGenres() {
+  return m_genres.size();
+}
+
 int ServerApiImpl::getTotalModels() {
   return m_db.getTotalModels();
 }
@@ -76,8 +81,17 @@ int ServerApiImpl::getTotalModels(const std::vector<std::string>& titles) {
   return m_db.getTotalModels(titles);
 }
 
+Genre ServerApiImpl::getGenre(const std::string& name) {
+  Genre genre(name);
+  return *(common::binary_find(m_genres.begin(), m_genres.end(), genre));
+}
+
 Model ServerApiImpl::getModel(int64_t id) {
   return m_db.getModel(id);
+}
+
+void ServerApiImpl::getGenres(std::vector<Genre>* const output) {
+  std::copy(m_genres.begin(), m_genres.end(), std::back_inserter(*output));
 }
 
 void ServerApiImpl::getModels(std::vector<SmallModel>* const output, int limit, int offset) {
@@ -86,9 +100,5 @@ void ServerApiImpl::getModels(std::vector<SmallModel>* const output, int limit, 
 
 void ServerApiImpl::getModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) {
   m_db.getSmallModels(output, limit, offset, titles);
-}
-
-void ServerApiImpl::getGenres(std::vector<Genre>* const output) {
-  std::copy(m_genres.begin(), m_genres.end(), std::back_inserter(*output));
 }
 

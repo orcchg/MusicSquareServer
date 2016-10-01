@@ -69,11 +69,13 @@ private:
   void sendToSocket(int socket, const std::string& data) const;
   void sendError(int socket, int error_code, const std::string& message) const;
   void sendIntValue(int socket, int value) const;
-  void sendModels(int socket, const std::vector<SmallModel>& models) const;
+  void sendGenre(int socket, const Genre& genre) const;
   void sendModel(int socket, const Model& model) const;
   void sendGenres(int socket, const std::vector<Genre>& genres) const;
+  void sendModels(int socket, const std::vector<SmallModel>& models) const;
 
   int64_t parseId(const std::string& path);
+  std::string parseName(const std::string& path);
   void parseGenresFromQuery(const Query& query, std::vector<std::string>* genres);
   void parseParamsGenres(const std::string& path, std::vector<std::string>* genres);
   void parseParamsForAll(const std::string& path, int* limit, int* offset, std::vector<std::string>* genres);

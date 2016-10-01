@@ -39,12 +39,14 @@ class ServerApiImpl : public IServerApi {
 public:
   ServerApiImpl();
   ~ServerApiImpl();
+  int getTotalGenres() override;
   int getTotalModels() override;
   int getTotalModels(const std::vector<std::string>& titles) override;
+  Genre getGenre(const std::string& name) override;
   Model getModel(int64_t id) override;
+  void getGenres(std::vector<Genre>* const output) override;
   void getModels(std::vector<SmallModel>* const output, int limit, int offset) override;
   void getModels(std::vector<SmallModel>* const output, int limit, int offset, const std::vector<std::string>& titles) override;
-  void getGenres(std::vector<Genre>* const output) override;
 
 private:
   db::ModelsDatabase m_db;

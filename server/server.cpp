@@ -72,8 +72,10 @@ Server::Server(int port)
 
   m_paths[PATH_ALL]    = Path::ALL;
   m_paths[PATH_GENRES] = Path::GENRES;
+  m_paths[PATH_GENRE]  = Path::GENRE;
   m_paths[PATH_SINGLE] = Path::SINGLE;
   m_paths[PATH_TOTAL]  = Path::TOTAL;
+  m_paths[PATH_TOTAL_GENRES] = Path::TOTAL_GENRES;
 
   m_api_impl = new ServerApiImpl();
 }
@@ -211,7 +213,7 @@ void Server::handleRequest(int socket) {
                 int limit = 0, offset = 0;
                 std::vector<std::string> genres;
                 parseParamsForAll(request.startline.path, &limit, &offset, &genres);
-                INF("Get all");
+                INF("Get all models");
                 std::vector<SmallModel> models;
                 if (genres.empty()) {
                   m_api_impl->getModels(&models, limit, offset);
@@ -235,12 +237,24 @@ void Server::handleRequest(int socket) {
               break;
           }
           break;
+        case Path::GENRE:
+          switch (method) {
+            case Method::GET:
+              {
+                std::string name = parseName(request.startline.path);
+                INF("Get genre");
+                Genre genre = m_api_impl->getGenre(name);
+                sendGenre(socket, genre);
+              }
+              break;
+          }
+          break;
         case Path::SINGLE:
           switch (method) {
             case Method::GET:
               {
                 int64_t id = parseId(request.startline.path);
-                INF("Get single");
+                INF("Get single model");
                 Model model = m_api_impl->getModel(id);
                 if (model.isEmpty()) {
                   sendError(socket, 404, "Model not found");
@@ -257,8 +271,19 @@ void Server::handleRequest(int socket) {
               {
                 std::vector<std::string> genres;
                 parseParamsGenres(request.startline.path, &genres);
-                INF("Get total");
+                INF("Get total models");
                 int total = m_api_impl->getTotalModels(genres);
+                sendIntValue(socket, total);
+              }
+              break;
+          }
+          break;
+        case Path::TOTAL_GENRES:
+          switch (method) {
+            case Method::GET:
+              {
+                INF("Get total genres");
+                int total = m_api_impl->getTotalGenres();
                 sendIntValue(socket, total);
               }
               break;
@@ -297,14 +322,9 @@ void Server::sendIntValue(int socket, int value) const {
   sendToSocket(socket, json.str());
 }
 
-void Server::sendModels(int socket, const std::vector<SmallModel>& models) const {
-  std::vector<const common::Jsonable*> ptrs;
-  ptrs.reserve(models.size());
-  for (auto& item : models) {
-    ptrs.push_back(&item);
-    VER("Send small model: %s", item.toString().c_str());
-  }
-  std::string json = common::arrayToJson(ptrs);
+void Server::sendGenre(int socket, const Genre& genre) const {
+  std::string json = genre.toJson();
+  VER("Send genre: %s", genre.toString().c_str());
   sendToSocket(socket, json);
 }
 
@@ -320,6 +340,17 @@ void Server::sendGenres(int socket, const std::vector<Genre>& genres) const {
   for (auto& item : genres) {
     ptrs.push_back(&item);
     VER("Send genre: %s", item.toString().c_str());
+  }
+  std::string json = common::arrayToJson(ptrs);
+  sendToSocket(socket, json);
+}
+
+void Server::sendModels(int socket, const std::vector<SmallModel>& models) const {
+  std::vector<const common::Jsonable*> ptrs;
+  ptrs.reserve(models.size());
+  for (auto& item : models) {
+    ptrs.push_back(&item);
+    VER("Send small model: %s", item.toString().c_str());
   }
   std::string json = common::arrayToJson(ptrs);
   sendToSocket(socket, json);
@@ -343,6 +374,19 @@ int64_t Server::parseId(const std::string& path) {
     FAT("Invalid id");
     return 0;
   }
+}
+
+std::string Server::parseName(const std::string& path) {
+  std::vector<Query> params;
+  m_parser.parsePath(path, &params);
+  for (auto& query : params) {
+    DBG("Query: %s: %s", query.key.c_str(), query.value.c_str());
+  }
+  if (params.size() < 1 || params[0].key.compare(ITEM_NAME) != 0) {
+    ERR("Wrong query params: %s", path.c_str());
+    return "";
+  }
+  return params[0].value;
 }
 
 void Server::parseGenresFromQuery(const Query& query, std::vector<std::string>* genres) {
